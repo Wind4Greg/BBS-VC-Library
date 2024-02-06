@@ -6,7 +6,7 @@ import { assert } from 'chai'
 
 import { readFile } from 'fs/promises'
 import { localLoader } from './documentLoader.js'
-import { canonicalizeAndGroup, createHmacIdLabelMapFunction, createHmac } from '../lib/primitives.js'
+import { canonicalizeAndGroup, createShuffledIdLabelMapFunction, createHmac } from '../lib/primitives.js'
 import { hexToBytes } from '@noble/hashes/utils'
 
 // For serialization of JavaScript Map via JSON
@@ -34,7 +34,7 @@ function reviverMap (key, value) {
 // Read input doc, keys, mandatory pointers from files
 const document = JSON.parse(await readFile(new URL('./specTestVectors/windDoc.json',
   import.meta.url)))
-const keyMaterial = JSON.parse(await readFile(new URL('./specTestVectors/SDKeyMaterial.json',
+const keyMaterial = JSON.parse(await readFile(new URL('./specTestVectors/BBSKeyMaterial.json',
   import.meta.url)))
 const mandatory = JSON.parse(await readFile(new URL('./specTestVectors/windMandatory.json',
   import.meta.url)))
@@ -45,7 +45,7 @@ const nquads = JSON.parse(await readFile(new URL('./specTestVectors/addBaseDocHM
 const transformed = JSON.parse(await readFile(new URL('./specTestVectors/addBaseTransform.json',
   import.meta.url)), reviverMap)
 
-const labelMapFactoryFunction = createHmacIdLabelMapFunction(createHmac(hmacKey))
+const labelMapFactoryFunction = createShuffledIdLabelMapFunction(createHmac(hmacKey))
 const groupDefinitions = { mandatory }
 const groupOutput = await canonicalizeAndGroup(document, labelMapFactoryFunction,
   groupDefinitions, { documentLoader: localLoader })

@@ -5,25 +5,32 @@ import { assert } from 'chai'
 
 import { readFile } from 'fs/promises'
 import { localLoader } from './documentLoader.js'
-import { verifyDerived } from '../lib/verifyDerived.js'
-import { base58btc } from 'multiformats/bases/base58'
+import { verifyDerived } from '../lib/BBSverifyDerived.js'
+import { API_ID_BBS_SHA, prepareGenerators } from '@grottonetworking/bbs-signatures'
+import { hexToBytes } from '@noble/hashes/utils'
+
+const gens = await prepareGenerators(30, API_ID_BBS_SHA)
 
 // Read input doc, keys, mandatory pointers from files
-const signedDerived = JSON.parse(await readFile(new URL('./specTestVectors/derivedRevealDocument.json',
+// const signedDerived = JSON.parse(await readFile(new URL('./specTestVectors/derivedRevealDocument.json',
+//   import.meta.url)))
+const signedDerived = JSON.parse(await readFile(new URL('../examples/output/derivedDocument.json',
   import.meta.url)))
-const keyMaterial = JSON.parse(await readFile(new URL('./specTestVectors/SDKeyMaterial.json',
+const keyMaterial = JSON.parse(await readFile(new URL('./specTestVectors/BBSKeyMaterial.json',
   import.meta.url)))
-const pubKey = base58btc.decode(keyMaterial.baseKeyPair.publicKeyMultibase).slice(2)
-
+const pubKey = hexToBytes(keyMaterial.publicKeyHex)
+const options = { documentLoader: localLoader }
 describe('verifyDerived', async function () {
   it('valid derived document', async function () {
-    const result = await verifyDerived(signedDerived, pubKey, { documentLoader: localLoader })
+    // verifyDerived (doc, pubKey, options, gens, ph)
+    const result = await verifyDerived(signedDerived, pubKey, options, gens, new Uint8Array())
+    // const result = await verifyDerived(signedDerived, pubKey, , gens)
     assert.isTrue(result)
   })
   it('invalid derived document changed sail number', async function () {
     const oldSailNo = signedDerived.credentialSubject.sailNumber
     signedDerived.credentialSubject.sailNumber = 'CA101'
-    const result = await verifyDerived(signedDerived, pubKey, { documentLoader: localLoader })
+    const result = await verifyDerived(signedDerived, pubKey, options, gens)
     assert.isFalse(result)
     signedDerived.credentialSubject.sailNumber = oldSailNo
   })
