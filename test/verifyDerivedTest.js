@@ -12,10 +12,12 @@ import { hexToBytes } from '@noble/hashes/utils'
 const gens = await prepareGenerators(30, API_ID_BBS_SHA)
 
 // Read input doc, keys, mandatory pointers from files
-// const signedDerived = JSON.parse(await readFile(new URL('./specTestVectors/derivedRevealDocument.json',
-//   import.meta.url)))
-const signedDerived = JSON.parse(await readFile(new URL('../examples/output/derivedDocument.json',
+const signedDerived = JSON.parse(await readFile(new URL('./specTestVectors/derivedRevealDocument.json',
   import.meta.url)))
+const ph = hexToBytes("113377aa") // From the spec.
+// const signedDerived = JSON.parse(await readFile(new URL('../examples/output/derivedDocument.json',
+//   import.meta.url)))
+// const ph = new Uint8Array()
 const keyMaterial = JSON.parse(await readFile(new URL('./specTestVectors/BBSKeyMaterial.json',
   import.meta.url)))
 const pubKey = hexToBytes(keyMaterial.publicKeyHex)
@@ -23,7 +25,7 @@ const options = { documentLoader: localLoader }
 describe('verifyDerived', async function () {
   it('valid derived document', async function () {
     // verifyDerived (doc, pubKey, options, gens, ph)
-    const result = await verifyDerived(signedDerived, pubKey, options, gens, new Uint8Array())
+    const result = await verifyDerived(signedDerived, pubKey, options, gens, ph)
     // const result = await verifyDerived(signedDerived, pubKey, , gens)
     assert.isTrue(result)
   })

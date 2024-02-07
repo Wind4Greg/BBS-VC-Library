@@ -1,7 +1,7 @@
 {
-    "name": "@grottonetworking/ecdsa-sd-2023-cryptosuite",
+    "name": "@grottonetworking/bbs-2023-cryptosuite",
     "version": "0.1.0",
-    "description": "JavaScript implementation of the ECDSA-SD-2023 cryptosuite",
+    "description": "JavaScript implementation of the BBS-2023 cryptosuite",
     "type": "module",
     "scripts": {
         "test": "mocha"
